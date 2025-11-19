@@ -1,12 +1,10 @@
 const mongoose = require("mongoose");
-const { version } = require("react");
 
 const schema = mongoose.Schema({
     role_name: {type: String ,required : true},
     is_active: {type: Boolean ,default : true},
     created_by: {
-        type: mongoose.SchemaTypes.ObjectId,
-        required: true
+        type: mongoose.SchemaTypes.ObjectId
     },
 },{
     versionKey : false,

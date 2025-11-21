@@ -1,3 +1,5 @@
+const { LOG_LEVEL } = require(".");
+
 module.exports = {
     HTTP_CODES : {
         OK : 200,
@@ -18,6 +20,16 @@ module.exports = {
         INT_SERVER_ERROR : 500,
         BAD_GATEWAY : 502,
     },
-    PASS_LENGTH : 8,
-    SUPER_ADMIN: "Super Admin"
+    PASS_LENGTH : 8, // password uzunluğu
+    
+    SUPER_ADMIN: "Super Admin",
+
+    LOG_LEVELS: { // Auditlogs class'ında durumlar için kullanılır
+        "INFO": "INFO",
+        "WARN": "WARN",
+        "ERROR": "ERROR",
+        "DEBUG": "DEBUG",
+        "VERBOSE": "VERBOSE",
+        "HTTP": "HTTP"
+    }
 }

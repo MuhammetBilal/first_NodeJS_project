@@ -14,9 +14,7 @@ const schema = mongoose.Schema({
         updatedAt: "updated_at"
     }
 });
-// User (Kullanıcı) Şeması tanımınızın hemen altında
 
-// Email alanının unique bir indeks olarak oluşturulmasını zorlar
 schema.index({ email: 1 }, { unique: true });
 class Users extends mongoose.Model{
 

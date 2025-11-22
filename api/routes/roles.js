@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const express = require("express");
-const { Query } = require("mongoose");
-const { head } = require("../app");
 const router = express.Router();
 
 

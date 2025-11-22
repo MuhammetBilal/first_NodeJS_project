@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const RolePrivileges = require("./RolePrivileges");
 
 const schema = mongoose.Schema({
-    role_name: {type: String, required: true, unique: true},
+    role_name: {type: String, required: true},
     is_active: {type: Boolean, default: true},
     created_by: {
         type: mongoose.SchemaTypes.ObjectId

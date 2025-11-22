@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 if(process.env.NODE_ENV != "production")
   require('dotenv').config()
 var createError = require('http-errors');
@@ -19,11 +20,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use((req, res, next)=>{
+/*app.use((req, res, next)=>{
   console.log("Ben app.js te tanımlanan bir middleware'im");
   next();
-});
+});*/
 app.use('/api', require('./routes/index'));
 
 // catch 404 and forward to error handler

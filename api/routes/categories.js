@@ -1,12 +1,12 @@
 const express = require("express");
-const { Query } = require("mongoose");
-const { head } = require("../app");
 const router = express.Router();
 const Categories = require("../db/models/Categories");
 const Response = require("../lib/Response");
 const CustomError = require("../lib/Error");
 const Enum = require("../config/Enum");
-const Auditlogs = require("../lib/Auditlogs")
+const Auditlogs = require("../lib/Auditlogs");
+const Logger = require("../lib/logger/LoggerClass");
+
 
 router.get("/", async(req, res, next) => {
    
@@ -34,9 +34,11 @@ router.post("/add", async(req, res) => {
         await category.save(); 
 
         Auditlogs.info(req.user?.email, "Categories","Add", category); // ekleme işleminin kaydı tutulur
+        Logger.info(req.user?.email, "Categories", "Add", category); // log işlemi terminalde yapılan işlem hakkında bilgi verir
 
         res.json(Response.successResponse({success:true}));
     }catch(err){
+        Logger.error(req.user?.email, "Categories", "Add", err); // log işlemi terminalde yapılan işlem hakkında bilgi verir
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }

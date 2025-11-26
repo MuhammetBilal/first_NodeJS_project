@@ -57,7 +57,7 @@ module.exports = function () {
         authenticate: function () {
             return passport.authenticate("jwt", { session: false })
         },
-        checkRoles: (...expectedRoles) => {
+        checkRoles: (...expectedRoles) => { //rolleri kontrol eden middleware
             return (req, res, next) => {
 
                 let i = 0;

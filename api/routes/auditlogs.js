@@ -1,16 +1,24 @@
+/* eslint-disable valid-typeof */
 const express = require("express");
 const router = express.Router();
 const Auditlogs = require("../db/models/Auditlogs");
 const Response = require("../lib/Response");
 const moment = require("moment/moment");
+const auth = require("../lib/auth")();
 
-router.post("/", async (req, res, next) =>{
+router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - kimlik doğrulama işlemi. Token kullanarak routerları kontrol eder.
+    next();
+}); 
+
+
+router.post("/", auth.checkRoles("auditlogs_view"), async (req, res, next) =>{
     try {
         let body = req.body;
         let query = {};
         let skip = body.skip;
         let limit = body.limit;
 
+        // eslint-disable-next-line valid-typeof
         if(typeof body.skip !== "numeric"){ // limit geçiş
             skip = 0;
         }
@@ -34,7 +42,7 @@ router.post("/", async (req, res, next) =>{
        
         res.json(Response.successResponse(auditlogs));
         
-    } catch (error) {
+    } catch (err) {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
     }

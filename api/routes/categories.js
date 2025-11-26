@@ -6,9 +6,13 @@ const CustomError = require("../lib/Error");
 const Enum = require("../config/Enum");
 const Auditlogs = require("../lib/Auditlogs");
 const Logger = require("../lib/logger/LoggerClass");
+const auth = require("../lib/auth")();
 
+router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - kimlik doğrulama işlemi. Token kullanarak routerları kontrol eder.
+    next();
+}); 
 
-router.get("/", async(req, res, next) => {
+router.get("/", auth.checkRoles("category_view"),async(req, res, next) => {
    
     try{
         let categories = await Categories.find({});     //SELECT sorgusu
@@ -20,7 +24,7 @@ router.get("/", async(req, res, next) => {
     }
 });
 
-router.post("/add", async(req, res) => {
+router.post("/add",auth.checkRoles("category_add"), async(req, res) => {
     let body = req.body;
     try{
         if(!body.name) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,"Validation Error!","name field must be filled");
@@ -44,7 +48,7 @@ router.post("/add", async(req, res) => {
     }
 });
 
-router.post("/update", async (req,res)=>{
+router.post("/update",auth.checkRoles("category_update"),  async (req,res)=>{
     let body = req.body;
     try {
         if(!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,"Validation Error!","_id field must be filled");
@@ -64,7 +68,7 @@ router.post("/update", async (req,res)=>{
     }
 });
 
-router.post("/delete", async (req,res)=>{
+router.post("/delete", auth.checkRoles("category_delete"), async (req,res)=>{
     let body = req.body;
     try {
         if(!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,"Validation Error!","_id field must be filled");

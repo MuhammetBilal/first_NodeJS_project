@@ -43,7 +43,7 @@ router.post("/", auth.checkRoles("auditlogs_view"), async (req, res, next) =>{
         res.json(Response.successResponse(auditlogs));
         
     } catch (err) {
-        let errorResponse = Response.errorResponse(err);
+        let errorResponse = Response.errorResponse(err, req.user?.language);
         res.status(errorResponse.code).json(errorResponse);
     }
 

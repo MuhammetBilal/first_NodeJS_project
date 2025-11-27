@@ -1,4 +1,5 @@
 /node_modules/
-/.history/
+.history/
 /package-lock.json
 tmp/
+.env

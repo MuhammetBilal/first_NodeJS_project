@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-env node */
 const express = require("express");
 const router = express.Router();
 const Categories = require("../db/models/Categories");
@@ -9,6 +11,9 @@ const Logger = require("../lib/logger/LoggerClass");
 const auth = require("../lib/auth")();
 const config = require("../config");
 const i18n = new (require("../lib/i18n"))(config.DEFAULT_LANG);
+const emitter = require("../lib/Emitter"); // bildirim
+const excelExport = new (require("../lib/Export"))();
+const fs = require("fs");
 
 router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - kimlik doğrulama işlemi. Token kullanarak routerları kontrol eder.
     next();
@@ -41,6 +46,7 @@ router.post("/add",/*auth.checkRoles("category_add"),*/ async(req, res) => {
 
         Auditlogs.info(req.user?.email, "Categories","Add", category); // ekleme işleminin kaydı tutulur
         Logger.info(req.user?.email, "Categories", "Add", category); // log işlemi terminalde yapılan işlem hakkında bilgi verir
+        emitter.getEmitter("notifications").emit("messages", {message: category.name + " is added."}); // bildirim gönderildi
 
         res.json(Response.successResponse({success:true}));
     }catch(err){
@@ -83,6 +89,31 @@ router.post("/delete", auth.checkRoles("category_delete"), async (req,res)=>{
     } catch (err) {
         let errorResponse = Response.errorResponse(err);
         res.status(errorResponse.code).json(errorResponse);
+    }
+});
+
+router.post("/export", auth.checkRoles("category_export"), async (req, res) => { // excel dosyası yazma işlemi
+    try {
+        let categories = await Categories.find({}); // kategori verileri çek
+
+
+        let excel = excelExport.toExcel( 
+            ["NAME", "IS ACTIVE?", "USER_ID", "CREATED AT", "UPDATED AT"], // sütün bilgileri
+            ["name", "is_active", "created_by", "created_at", "updated_at"],
+            categories
+        )
+
+        let filePath = __dirname + "/../tmp/categories_excel_" + Date.now() + ".xlsx"; // dosya yolu
+
+        fs.writeFileSync(filePath, excel, "UTF-8"); // excele yazma
+
+        res.download(filePath); // dosyayı indirme
+
+        // fs.unlinkSync(filePath);
+
+    } catch (err) {
+        let errorResponse = Response.errorResponse(err);
+        res.status(errorResponse.code).json(Response.errorResponse(err));
     }
 });
 module.exports = router;

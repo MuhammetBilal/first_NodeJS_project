@@ -12,6 +12,20 @@ const UserRoles = require('../db/models/UserRoles');
 const config = require('../config');
 const auth = require("../lib/auth")();
 const i18n = new (require("../lib/i18n"))(config.DEFAULT_LANG);
+const { rateLimit } = require("express-rate-limit");
+const RateLimitMongo = require("rate-limit-mongo");
+
+const limiter = rateLimit({ // hatalı giriş yaparken 5ten fazla hatalı giriş yapılırsa 15 dk bekletilecek
+  store: new RateLimitMongo({
+    uri: "mongodb://127.0.0.1:27017/first_NodeJS_Project",
+    collectionName: "rateLimits",
+    expireTimeMs: 15 * 60 * 1000 // 15 minutes
+  }),
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 5, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  // standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+});
 
 router.post("/register", async (req, res) => {
   let body = req.body;
@@ -65,19 +79,15 @@ router.post("/register", async (req, res) => {
   }
 })
 
-router.post("/auth", async (req, res) => {
+router.post("/auth",limiter, async (req, res) => {
   try {
-
     let { email, password } = req.body;
 
     Users.validateFieldsBeforeAuth(email, password);
-
     let user = await Users.findOne({ email });
-
     if (!user) throw new CustomError(Enum.HTTP_CODES.UNAUTHORIZED, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", config.DEFAULT_LANG), i18n.translate("USERS.AUTH_ERROR", config.DEFAULT_LANG));
 
     if (!user.validPassword(password)) throw new CustomError(Enum.HTTP_CODES.UNAUTHORIZED, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", config.DEFAULT_LANG), i18n.translate("USERS.AUTH_ERROR", config.DEFAULT_LANG));
-
     let payload = {
       id: user._id,
       exp: parseInt(Date.now() / 1000) + config.JWT.EXPIRE_TIME
@@ -90,7 +100,6 @@ router.post("/auth", async (req, res) => {
       first_name: user.first_name,
       last_name: user.last_name
     }
-
     res.json(Response.successResponse({ token, user: userData }));
 
   } catch (err) {
@@ -182,6 +191,11 @@ router.post('/update',/*auth.checkRoles("users_update"),*/ async (req, res) => {
       if(body.first_name) updates.first_name = body.first_name;
       if(body.last_name) updates.last_name = body.last_name;
       if(body.phone_number) updates.phone_number = body.phone_number;
+
+      if (body._id == req.user.id) { // kullanıcının kendi kendine yetki yükseltmesinin önüne geçildi
+      // throw new CustomError(Enum.HTTP_CODES.FORBIDDEN, i18n.translate("COMMON.NEED_PERMISSIONS", req.user.language), i18n.translate("COMMON.NEED_PERMISSIONS", req.user.language))
+      body.roles = null;
+    }
 
       if(Array.isArray(body.roles) && body.roles.length > 0 ){
         let userRoles = await UserRoles.find({user_id: body._id});

@@ -1,5 +1,5 @@
 const Enum = require("../config/Enum");
-const AuditlogsModel = require("../db/models/Auditlogs");
+const AuditlogsModel = require("../db/models/AuditLogs");
 
 let instance = null;
 // bu sınıf veri tabanında yapılan herhangi bir değişikliği kaydeder

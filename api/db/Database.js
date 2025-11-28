@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-env node */
 const mongoose = require("mongoose");
 let instance = null;
 class Database {

@@ -1,9 +1,9 @@
 /* eslint-disable valid-typeof */
 const express = require("express");
 const router = express.Router();
-const Auditlogs = require("../db/models/Auditlogs");
+const Auditlogs = require("../db/models/AuditLogs");
 const Response = require("../lib/Response");
-const moment = require("moment/moment");
+const moment = require("moment");
 const auth = require("../lib/auth")();
 
 router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - kimlik doğrulama işlemi. Token kullanarak routerları kontrol eder.

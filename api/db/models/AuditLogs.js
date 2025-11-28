@@ -19,4 +19,4 @@ class AuditLogs extends mongoose.Model{
 }
 
 schema.loadClass(AuditLogs);
-module.exports = mongoose.model("auditlogs", schema);
+module.exports = mongoose.models.auditlogs || mongoose.model("auditlogs", schema);

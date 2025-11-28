@@ -65,38 +65,39 @@ router.post("/register", async (req, res) => {
   }
 })
 
-router.post("/auth", async (req,res) => {
+router.post("/auth", async (req, res) => {
   try {
 
-    let {email, password} = req.body; // kullanıcı email ve password çekildi
+    let { email, password } = req.body;
 
-    Users.validateFieldsBeforeAuth(email,password);
+    Users.validateFieldsBeforeAuth(email, password);
 
-    let user = await Users.findOne( {email} );
+    let user = await Users.findOne({ email });
 
-    if(!user) throw new CustomError(Enum.HTTP_CODES.UNAUTHORIZED,i18n.translate("COMMON.VALIDATION_ERROR_TITLE",req.user.language),i18n.translate("USERS.AUTH_ERROR",req.user.language )); // kullanıcı kontrolü yapıldı kullanıcı bulundu
+    if (!user) throw new CustomError(Enum.HTTP_CODES.UNAUTHORIZED, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", config.DEFAULT_LANG), i18n.translate("USERS.AUTH_ERROR", config.DEFAULT_LANG));
 
-    if(!user.validPassword) throw new CustomError(Enum.HTTP_CODES.UNAUTHORIZED,i18n.translate("COMMON.VALIDATION_ERROR_TITLE",req.user.language),i18n.translate("USERS.AUTH_ERROR",req.user.language )); 
+    if (!user.validPassword(password)) throw new CustomError(Enum.HTTP_CODES.UNAUTHORIZED, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", config.DEFAULT_LANG), i18n.translate("USERS.AUTH_ERROR", config.DEFAULT_LANG));
 
     let payload = {
       id: user._id,
-      exp: parseInt(Date.now() / 1000) * config.JWT.EXPIRE_TIME
+      exp: parseInt(Date.now() / 1000) + config.JWT.EXPIRE_TIME
     }
 
     let token = jwt.encode(payload, config.JWT.SECRET);
 
     let userData = {
-      _id : user._id,
+      _id: user._id,
       first_name: user.first_name,
       last_name: user.last_name
     }
-    res.json(Response.successResponse({token,user: userData}));
+
+    res.json(Response.successResponse({ token, user: userData }));
 
   } catch (err) {
     let errorResponse = Response.errorResponse(err);
-        res.status(errorResponse.code).json(errorResponse);
+    res.status(errorResponse.code).json(errorResponse);
   }
-});
+})
 // burda router.all diğer routerlarda oldğundan farklı yerde. sebebi ise giriş yapmadan token olaşamayacağı için kontrol giriş yapılınca olur.
 router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - kimlik doğrulama işlemi. Token kullanarak routerları kontrol eder.
     next();

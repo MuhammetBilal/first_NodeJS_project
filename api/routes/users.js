@@ -1,6 +1,6 @@
 var express = require('express');
 const bcrypt = require("bcrypt-nodejs"); // password hash işlemi için kullanılır.
-const is = require("is_js"); // email kontrol için kullanılır
+const validator = require("validator"); // email kontrol için kullanılır
 const jwt = require("jwt-simple");
 const Users = require('../db/models/Users');
 var router = express.Router();
@@ -25,7 +25,7 @@ router.post("/register", async (req, res) => {
 
     if (!body.email) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "email field must be filled");
 
-    if (is.not.email(body.email)) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "email field must be an email format");
+    if (!validator.isEmail(body.email)) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "email field must be an email format");
 
     if (!body.password) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, "Validation Error!", "password field must be filled");
 
@@ -104,8 +104,13 @@ router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - ki
 /* GET users listing. */
 router.get('/',/*auth.checkRoles("users_view"),*/ async (req, res) => {
     try {
-      let users = await Users.find({});
-
+      let users = await Users.find({},{password: 0}).lean(); // SELECT * FROM Users; password: 0 şifreyi alma demek
+      
+              for(let i=0; i<users.length; i++){
+      
+                  let permission = await UserRoles.find({user_id: users[i]._id}).populate("role_id");
+                  users[i].permission = permission;
+              }
       res.json(Response.successResponse(users));
 
     } catch (err) {
@@ -119,7 +124,7 @@ router.post('/add',auth.checkRoles("users_add"), async (req, res) => {
     try {
         if(!body.email) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, i18n.translate("COMMON.VALIDATION_ERROR_TITLE",req.user.language),i18n.translate("COMMON.FIELD_MUST_BE_FILLED",req.user.language, ["email"]));
 
-        if(is.not.email(body.email)) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,i18n.translate("COMMON.VALIDATION_ERROR_TITLE",req.user.language),i18n.translate("USERS.EMAIL_FORMAT_ERROR",req.user.language)); // email formatında olup olmadığını kontrol ediyor
+        if(!validator.isEmail(body.email)) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,i18n.translate("COMMON.VALIDATION_ERROR_TITLE",req.user.language),i18n.translate("USERS.EMAIL_FORMAT_ERROR",req.user.language)); // email formatında olup olmadığını kontrol ediyor
 
         if(!body.password) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST,  i18n.translate("COMMON.VALIDATION_ERROR_TITLE",req.user.language),i18n.translate("COMMON.FIELD_MUST_BE_FILLED",req.user.language, ["password"]));
 

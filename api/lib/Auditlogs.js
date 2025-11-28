@@ -1,4 +1,3 @@
-const { error } = require("is_js");
 const Enum = require("../config/Enum");
 const AuditlogsModel = require("../db/models/Auditlogs");
 

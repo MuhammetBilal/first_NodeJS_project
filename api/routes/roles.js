@@ -19,7 +19,14 @@ router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - ki
 
 router.get("/",/*auth.checkRoles("role_view"), */ async(req, res, next)=>{
    try {
-        let roles  = await Roles.find({});
+        let roles  = await Roles.find({}).lean();
+
+        for(let i=0; i<roles.length; i++){
+
+            let permission = await RolePrivileges.find({role_id: roles[i]._id});
+            roles[i].permission = permission;
+        }
+
         res.json(Response.successResponse(roles));
    } catch (err) {
         let errorResponse = Response.errorResponse(err);
@@ -27,6 +34,7 @@ router.get("/",/*auth.checkRoles("role_view"), */ async(req, res, next)=>{
    }
 
 });
+
 router.post("/add",auth.checkRoles("role_add"),  async (req, res) => {
     let body = req.body;
     try {

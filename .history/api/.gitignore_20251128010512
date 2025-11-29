@@ -1,9 +1,0 @@
-# Node.js bağımlılıkları
-/node_modules/
-
-# VS Code geçmiş dosyaları
-/.history/
-
-# Diğer ana dosyalar
-/package-lock.json
-tmp/

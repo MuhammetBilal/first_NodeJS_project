@@ -20,49 +20,49 @@ module.exports = {
 
     privileges: [
         {
-            key: "user_view",
+            key: "users_view",
             name: "User View",
             group: "USERS",
             description: "User view"
         },
         {
-            key: "user_add",
+            key: "users_add",
             name: "User Add",
             group: "USERS",
             description: "User add"
         },
         {
-            key: "user_update",
+            key: "users_update",
             name: "User Update",
             group: "USERS",
             description: "User update"
         },
         {
-            key: "user_delete",
+            key: "users_delete",
             name: "User Delete",
             group: "USERS",
             description: "User delete"
         },
         {
-            key: "role_view",
+            key: "roles_view",
             name: "Role View",
             group: "ROLES",
             description: "Role view"
         },
         {
-            key: "role_add",
+            key: "roles_add",
             name: "Role Add",
             group: "ROLES",
             description: "Role add"
         },
         {
-            key: "role_update",
+            key: "roles_update",
             name: "Role Update",
             group: "ROLES",
             description: "Role update"
         },
         {
-            key: "role_delete",
+            key: "roles_delete",
             name: "Role Delete",
             group: "ROLES",
             description: "Role delete"

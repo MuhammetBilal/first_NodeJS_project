@@ -25,7 +25,7 @@ module.exports = function () {
                 let userRoles = await UserRoles.find({ user_id: payload.id });
 
                 let rolePrivileges = await RolePrivileges.find({ role_id: { $in: userRoles.map(ur => ur.role_id) } });
-
+                
                 let privileges = rolePrivileges.map(rp => privs.privileges.find(x => x.key == rp.permission))
 
                 done(null, {

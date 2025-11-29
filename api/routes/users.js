@@ -21,7 +21,7 @@ const limiter = rateLimit({ // hatalı giriş yaparken 5ten fazla hatalı giriş
     collectionName: "rateLimits",
     expireTimeMs: 15 * 60 * 1000 // 15 minutes
   }),
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 1 * 60 * 1000, // 15 minutes
   limit: 5, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
   // standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
@@ -112,7 +112,7 @@ router.all("*",auth.authenticate(), (req, res, next) => { // authenticaiton - ki
     next();
 }); 
 /* GET users listing. */
-router.get('/',/*auth.checkRoles("users_view"),*/ async (req, res) => {
+router.get('/',auth.checkRoles("users_view"), async (req, res) => {
     try {
       let users = await Users.find({},{password: 0}).lean(); // SELECT * FROM Users; password: 0 şifreyi alma demek
       
@@ -176,7 +176,7 @@ router.post('/add',auth.checkRoles("users_add"), async (req, res) => {
       }
 });
 
-router.post('/update',/*auth.checkRoles("users_update"),*/ async (req, res) => {
+router.post('/update',auth.checkRoles("users_update"), async (req, res) => {
   try {
       let body = req.body;  
       let updates = {};

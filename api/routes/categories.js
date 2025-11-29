@@ -111,7 +111,7 @@ router.post("/delete", auth.checkRoles("category_delete"), async (req, res) => {
     try {
         if (!body._id) throw new CustomError(Enum.HTTP_CODES.BAD_REQUEST, i18n.translate("COMMON.VALIDATION_ERROR_TITLE", req.user.language), i18n.translate("COMMON.FIELD_MUST_BE_FILLED", req.user.language, ["_id"]));
 
-        await Categories.remove({ _id: body._id });
+        await Categories.deleteOne({ _id: body._id });
 
         AuditLogs.info(req.user?.email, "Categories", "Delete", { _id: body._id });
 

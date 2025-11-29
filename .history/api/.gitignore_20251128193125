@@ -1,0 +1,13 @@
+node_modules/
+
+.history/
+
+tmp/
+
+.env
+
+*.log
+npm-debug.log*
+
+.DS_Store
+Thumbs.db

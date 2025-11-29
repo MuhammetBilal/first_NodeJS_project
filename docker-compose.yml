@@ -1,10 +1,23 @@
+version: '3.8'
+
 services:
-  app:
-    image: mbilal/admin-panel:latest
+  # 1. BACKEND (API)
+  api:
+    build: ./api
+    container_name: proje-api
+    ports:
+      - "3000:3000"
     environment:
+      # DİKKAT: 'host.docker.internal' sayesinde senin Windows'undaki MongoDB'ye bağlanacak
       - CONNECTION_STRING=mongodb://host.docker.internal:27017/first_NodeJS_Project
       - LOG_LEVEL=info
-      - FILE_UPLOAD_PATH=/data/uploads
+    # depends_on: mongo  <-- Bunu sildik çünkü artık Docker'daki Mongoya bağlı değiliz
+
+  # 2. FRONTEND (Client)
+  client:
+    build: ./client
+    container_name: proje-client
     ports:
-      - 3000:3000
-    # network_mode: host
+      - "5173:5173"
+    depends_on:
+      - api # API başlamadan Frontend başlamasın

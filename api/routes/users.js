@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 var express = require('express');
 const bcrypt = require("bcrypt-nodejs"); // password hash işlemi için kullanılır.
 const validator = require("validator"); // email kontrol için kullanılır
@@ -17,11 +18,11 @@ const RateLimitMongo = require("rate-limit-mongo");
 
 const limiter = rateLimit({ // hatalı giriş yaparken 5ten fazla hatalı giriş yapılırsa 15 dk bekletilecek
   store: new RateLimitMongo({
-    uri: "mongodb://127.0.0.1:27017/first_NodeJS_Project",
+    uri: process.env.CONNECTION_STRING || config.CONNECTION_STRING,
     collectionName: "rateLimits",
     expireTimeMs: 15 * 60 * 1000 // 15 minutes
   }),
-  windowMs: 1 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 5, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
   // standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
